@@ -80,4 +80,18 @@
     .badge-danger {
         @apply bg-red-100 text-red-800;
     }
+
+    .transaction-card {
+        @apply relative;
+    }
+
+    .transaction-card.pending::before {
+        content: '';
+        @apply absolute left-0 top-0 h-full w-1 bg-yellow-400 rounded-l-lg;
+    }
+
+    .transaction-card.paid::before {
+        content: '';
+        @apply absolute left-0 top-0 h-full w-1 bg-green-400 rounded-l-lg;
+    }
 }

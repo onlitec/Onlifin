@@ -31,95 +31,93 @@
     <script src="//unpkg.com/imask"></script>
 </head>
 <body class="font-sans antialiased bg-gray-50">
-    <div class="min-h-screen flex">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-lg hidden lg:block">
-            <div class="h-full flex flex-col">
-                <!-- Logo -->
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h1 class="text-2xl font-bold text-gray-800">Onlifin</h1>
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo e Nome -->
+                <div class="flex items-center">
+                    <a href="{{ route('dashboard') }}" class="flex items-center">
+                        <span class="text-xl font-bold text-gray-900">Onlifin</span>
+                    </a>
                 </div>
-                
-                <!-- Navigation -->
-                <nav class="flex-1 px-4 py-6 space-y-1">
-                    <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg group {{ request()->is('/') || request()->is('dashboard') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <i class="ri-dashboard-line mr-3 text-lg"></i>
-                        <span>Dashboard</span>
-                    </a>
-                    
-                    <a href="{{ route('transactions') }}" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg group {{ request()->routeIs('transactions*') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <i class="ri-exchange-line mr-3 text-lg"></i>
-                        <span>Transações</span>
-                    </a>
-                    
-                    <a href="{{ route('categories') }}" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg group {{ request()->routeIs('categories*') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <i class="ri-price-tag-3-line mr-3 text-lg"></i>
-                        <span>Categorias</span>
-                    </a>
-                    
-                    <a href="{{ route('accounts') }}" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg group {{ request()->routeIs('accounts*') ? 'bg-blue-50 text-blue-600' : '' }}">
-                        <i class="ri-bank-line mr-3 text-lg"></i>
-                        <span>Contas</span>
-                    </a>
 
-                    @if(auth()->user()->is_admin)
-                        <a href="{{ route('settings.index') }}" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg group {{ request()->routeIs('settings*') ? 'bg-blue-50 text-blue-600' : '' }}">
-                            <i class="ri-settings-3-line mr-3 text-lg"></i>
-                            <span>Configurações</span>
-                        </a>
-                    @endif
-                </nav>
-                
-                <!-- User Menu -->
-                <div class="border-t border-gray-200 p-4">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                                {{ substr(auth()->user()->name, 0, 1) }}
-                            </div>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-gray-700">{{ auth()->user()->name }}</p>
-                            <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
+                <!-- Menu do Usuário -->
+                <div class="flex items-center">
+                    <div class="relative" x-data="{ open: false }">
+                        <!-- Botão do Menu -->
+                        <button @click="open = !open" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none">
+                            <span class="text-sm font-medium">{{ Auth::user()->name }}</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </button>
+
+                        <!-- Menu Dropdown -->
+                        <div x-show="open" 
+                             @click.away="open = false"
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
+                            
+                            <!-- Link para Configurações (se for admin) -->
+                            @if(Auth::user()->isAdmin())
+                            <a href="{{ route('settings.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="ri-settings-3-line mr-2"></i>
+                                Configurações
+                            </a>
+                            @endif
+
+                            <!-- Botão de Logout -->
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                    <i class="ri-logout-box-r-line mr-2"></i>
+                                    Sair
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar e Conteúdo Principal -->
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 min-h-screen">
+            <nav class="p-4 space-y-2">
+                <a href="{{ route('dashboard') }}" 
+                   class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-gray-100' : '' }}">
+                    <i class="ri-dashboard-line mr-3"></i>
+                    Dashboard
+                </a>
+                
+                <a href="{{ route('transactions') }}"
+                   class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg {{ request()->routeIs('transactions*') ? 'bg-gray-100' : '' }}">
+                    <i class="ri-exchange-funds-line mr-3"></i>
+                    Transações
+                </a>
+
+                <a href="{{ route('categories') }}"
+                   class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg {{ request()->routeIs('categories*') ? 'bg-gray-100' : '' }}">
+                    <i class="ri-price-tag-3-line mr-3"></i>
+                    Categorias
+                </a>
+
+                <a href="{{ route('accounts') }}"
+                   class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg {{ request()->routeIs('accounts*') ? 'bg-gray-100' : '' }}">
+                    <i class="ri-bank-line mr-3"></i>
+                    Contas
+                </a>
+            </nav>
         </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1">
-            <!-- Top Navigation -->
-            <header class="bg-white shadow-sm">
-                <div class="flex items-center justify-between px-6 py-4">
-                    <div class="flex items-center lg:hidden">
-                        <button type="button" class="text-gray-600 hover:text-gray-900">
-                            <i class="ri-menu-line text-2xl"></i>
-                        </button>
-                    </div>
-                    
-                    <div class="flex items-center space-x-4">
-                        <button type="button" class="text-gray-600 hover:text-gray-900">
-                            <i class="ri-notification-3-line text-xl"></i>
-                        </button>
-                        
-                        <div class="relative">
-                            <button type="button" class="flex items-center text-gray-600 hover:text-gray-900">
-                                <span class="mr-2">{{ auth()->user()->name }}</span>
-                                <i class="ri-arrow-down-s-line"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Page Content -->
-            <main class="p-6">
-                {{ $slot }}
-            </main>
-        </div>
+        <!-- Conteúdo Principal -->
+        <main class="flex-1 p-8">
+            {{ $slot }}
+        </main>
     </div>
 
     @livewireScripts
+    <script src="https://unpkg.com/imask"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </body>
 </html> 

@@ -139,6 +139,15 @@
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    <!-- Status -->
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select" required>
+                            <option value="pending" {{ old('status') === 'pending' ? 'selected' : '' }}>Pendente</option>
+                            <option value="paid" {{ old('status') === 'paid' ? 'selected' : '' }}>Pago</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Botões -->

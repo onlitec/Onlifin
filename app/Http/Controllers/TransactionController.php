@@ -30,6 +30,7 @@ class TransactionController extends Controller
     {
         $validated = $request->validate([
             'type' => 'required|in:income,expense',
+            'status' => 'required|in:pending,paid',
             'date' => 'required|date',
             'description' => 'required|string|max:255',
             'amount' => 'required|string',
@@ -38,18 +39,13 @@ class TransactionController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        // Converte o valor para centavos sem multiplicar por 100
+        // Converte o valor para centavos
         $amount = (float) $validated['amount'];
-        $amount = round($amount * 100); // Converte para centavos
-
-        // Log para debug
-        \Log::info('Valor recebido:', [
-            'original' => $validated['amount'],
-            'convertido' => $amount
-        ]);
+        $amount = round($amount * 100);
 
         $transaction = Transaction::create([
             'type' => $validated['type'],
+            'status' => $validated['status'],
             'date' => $validated['date'],
             'description' => $validated['description'],
             'amount' => $amount,
@@ -59,7 +55,8 @@ class TransactionController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        return redirect()->route('transactions')->with('success', 'Transação criada com sucesso!');
+        return redirect()->route('transactions')
+            ->with('success', 'Transação criada com sucesso!');
     }
 
     public function edit(Transaction $transaction)
@@ -77,7 +74,6 @@ class TransactionController extends Controller
 
     public function update(Request $request, Transaction $transaction)
     {
-        // Verifica se o usuário tem permissão para editar esta transação
         if ($transaction->user_id !== auth()->id()) {
             abort(403);
         }
@@ -87,6 +83,7 @@ class TransactionController extends Controller
             'amount' => 'required|numeric|min:0',
             'date' => 'required|date',
             'type' => 'required|in:income,expense',
+            'status' => 'required|in:pending,paid',
             'category_id' => 'required|exists:categories,id',
             'account_id' => 'required|exists:accounts,id',
         ]);
@@ -103,6 +100,35 @@ class TransactionController extends Controller
 
     public function destroy(Transaction $transaction)
     {
-        // Implementar lógica de exclusão
+        // Verifica se o usuário tem permissão para excluir esta transação
+        if ($transaction->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        try {
+            $transaction->delete();
+            return redirect()
+                ->back()
+                ->with('success', 'Transação excluída com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Erro ao excluir transação: ' . $e->getMessage());
+        }
+    }
+
+    public function markAsPaid(Transaction $transaction)
+    {
+        if ($transaction->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $transaction->update(['status' => 'paid']);
+
+        $message = $transaction->type === 'income' 
+            ? 'Receita marcada como recebida!' 
+            : 'Despesa marcada como paga!';
+
+        return back()->with('success', $message);
     }
 } 

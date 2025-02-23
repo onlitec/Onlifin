@@ -20,6 +20,7 @@
                                 <th class="table-header-cell">Conta</th>
                                 <th class="table-header-cell">Valor</th>
                                 <th class="table-header-cell">Tipo</th>
+                                <th class="table-header-cell">Status</th>
                                 <th class="table-header-cell">Ações</th>
                             </tr>
                         </thead>
@@ -37,13 +38,47 @@
                                         </span>
                                     </td>
                                     <td class="table-cell">
-                                        <div class="flex items-center space-x-2">
-                                            <a href="{{ route('transactions.edit', $transaction) }}" class="text-blue-600 hover:text-blue-800">
-                                                <i class="ri-pencil-line"></i>
+                                        <span class="px-2 py-1 text-xs rounded-full 
+                                                     {{ $transaction->isPaid() ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                            @if($transaction->type === 'income')
+                                                {{ $transaction->isPaid() ? 'Recebido' : 'A Receber' }}
+                                            @else
+                                                {{ $transaction->isPaid() ? 'Pago' : 'A Pagar' }}
+                                            @endif
+                                        </span>
+                                    </td>
+                                    <td class="table-cell">
+                                        <div class="flex gap-2">
+                                            @if($transaction->isPending())
+                                                <form action="{{ route('transactions.mark-as-paid', $transaction->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" 
+                                                            class="p-2 text-green-600 hover:bg-green-100 rounded-lg transition-colors duration-200"
+                                                            title="{{ $transaction->type === 'income' ? 'Marcar como Recebido' : 'Marcar como Pago' }}">
+                                                        <i class="ri-checkbox-circle-line text-xl"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            <a href="{{ route('transactions.edit', $transaction->id) }}" 
+                                               class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                                               title="Editar">
+                                                <i class="ri-edit-line text-xl"></i>
                                             </a>
-                                            <button type="button" class="text-red-600 hover:text-red-800">
-                                                <i class="ri-delete-bin-line"></i>
-                                            </button>
+
+                                            <form action="{{ route('transactions.destroy', $transaction->id) }}" 
+                                                  method="POST" 
+                                                  class="inline"
+                                                  onsubmit="return confirm('Tem certeza que deseja excluir esta transação?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors duration-200"
+                                                        title="Excluir">
+                                                    <i class="ri-delete-bin-line text-xl"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

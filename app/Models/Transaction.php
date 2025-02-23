@@ -9,18 +9,19 @@ class Transaction extends Model
 {
     protected $fillable = [
         'type',
+        'status',
         'date',
         'description',
         'amount',
         'category_id',
         'account_id',
-        'notes',
-        'user_id'
+        'user_id',
+        'notes'
     ];
 
     protected $casts = [
         'date' => 'datetime',
-        'amount' => 'decimal:2',
+        'amount' => 'integer',
     ];
 
     public function category(): BelongsTo
@@ -51,5 +52,16 @@ class Transaction extends Model
             $value = (float) str_replace(',', '.', str_replace('.', '', $value));
         }
         $this->attributes['amount'] = $value;
+    }
+
+    // Adicione estes métodos auxiliares
+    public function isPaid()
+    {
+        return $this->status === 'paid';
+    }
+
+    public function isPending()
+    {
+        return $this->status === 'pending';
     }
 }

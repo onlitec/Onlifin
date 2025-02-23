@@ -104,4 +104,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('transactions.edit');
     Route::put('/transactions/{transaction}', [TransactionController::class, 'update'])
         ->name('transactions.update');
+    Route::patch('/transactions/{transaction}/mark-as-paid', [TransactionController::class, 'markAsPaid'])
+        ->name('transactions.mark-as-paid');
 });

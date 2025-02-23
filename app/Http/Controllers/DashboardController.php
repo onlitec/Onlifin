@@ -9,9 +9,15 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Totais gerais
-        $totalIncome = Transaction::where('type', 'income')->sum('amount');
-        $totalExpenses = Transaction::where('type', 'expense')->sum('amount');
+        // Totais apenas de transações pagas
+        $totalIncome = Transaction::where('type', 'income')
+            ->where('status', 'paid')
+            ->sum('amount');
+        
+        $totalExpenses = Transaction::where('type', 'expense')
+            ->where('status', 'paid')
+            ->sum('amount');
+        
         $balance = $totalIncome - $totalExpenses;
 
         // Transações de hoje
@@ -19,12 +25,14 @@ class DashboardController extends Controller
         $todayIncomes = Transaction::with(['category', 'account'])
             ->where('type', 'income')
             ->whereDate('date', $today)
+            ->orderBy('status', 'asc') // Pendentes primeiro
             ->orderBy('date')
             ->get();
 
         $todayExpenses = Transaction::with(['category', 'account'])
             ->where('type', 'expense')
             ->whereDate('date', $today)
+            ->orderBy('status', 'asc')
             ->orderBy('date')
             ->get();
 
@@ -33,12 +41,30 @@ class DashboardController extends Controller
         $tomorrowIncomes = Transaction::with(['category', 'account'])
             ->where('type', 'income')
             ->whereDate('date', $tomorrow)
+            ->orderBy('status', 'asc')
             ->orderBy('date')
             ->get();
 
         $tomorrowExpenses = Transaction::with(['category', 'account'])
             ->where('type', 'expense')
             ->whereDate('date', $tomorrow)
+            ->orderBy('status', 'asc')
+            ->orderBy('date')
+            ->get();
+
+        // Transações pendentes dos próximos 7 dias
+        $nextWeek = now()->addDays(7)->format('Y-m-d');
+        $pendingIncomes = Transaction::with(['category', 'account'])
+            ->where('type', 'income')
+            ->where('status', 'pending')
+            ->whereBetween('date', [now()->addDays(2)->format('Y-m-d'), $nextWeek])
+            ->orderBy('date')
+            ->get();
+
+        $pendingExpenses = Transaction::with(['category', 'account'])
+            ->where('type', 'expense')
+            ->where('status', 'pending')
+            ->whereBetween('date', [now()->addDays(2)->format('Y-m-d'), $nextWeek])
             ->orderBy('date')
             ->get();
 
@@ -49,7 +75,9 @@ class DashboardController extends Controller
             'todayIncomes',
             'todayExpenses',
             'tomorrowIncomes',
-            'tomorrowExpenses'
+            'tomorrowExpenses',
+            'pendingIncomes',
+            'pendingExpenses'
         ));
     }
 } 
