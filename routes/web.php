@@ -67,14 +67,21 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::delete('/accounts/{account}', [AccountController::class, 'destroy'])->name('accounts.destroy');
 
     // Configurações (protegidas por middleware admin)
-    Route::prefix('settings')->name('settings.')->middleware(AdminMiddleware::class)->group(function () {
+    Route::prefix('settings')->name('settings.')->middleware(['web', 'auth', AdminMiddleware::class])->group(function () {
         Route::get('/', [SettingsController::class, 'index'])->name('index');
         Route::get('/users', [SettingsController::class, 'users'])->name('users');
         Route::get('/roles', [SettingsController::class, 'roles'])->name('roles');
-        Route::get('/permissions', [SettingsController::class, 'permissions'])->name('permissions');
+        
+        // Rotas de Relatórios
         Route::get('/reports', [SettingsController::class, 'reports'])->name('reports');
+        Route::post('/reports/transactions', [SettingsController::class, 'generateTransactionsReport'])->name('reports.transactions');
+        
+        // Rotas de Backup
         Route::get('/backup', [SettingsController::class, 'backup'])->name('backup');
         Route::post('/backup', [SettingsController::class, 'createBackup'])->name('backup.create');
+        Route::get('/backup/{filename}', [SettingsController::class, 'downloadBackup'])->name('backup.download');
+        Route::delete('/backup/{filename}', [SettingsController::class, 'deleteBackup'])->name('backup.delete');
+        Route::post('/backup/restore', [SettingsController::class, 'restoreBackup'])->name('backup.restore');
     });
 
     // Rota de teste para o middleware admin
@@ -90,3 +97,11 @@ Route::post('/logout', function () {
     session()->regenerateToken();
     return redirect('/');
 })->middleware('auth')->name('logout');
+
+// Rotas de Transações
+Route::middleware(['auth'])->group(function () {
+    Route::get('/transactions/{transaction}/edit', [TransactionController::class, 'edit'])
+        ->name('transactions.edit');
+    Route::put('/transactions/{transaction}', [TransactionController::class, 'update'])
+        ->name('transactions.update');
+});

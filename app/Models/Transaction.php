@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Transaction extends Model
 {
     protected $fillable = [
+        'type',
         'date',
         'description',
         'amount',
-        'type',
         'category_id',
         'account_id',
-        'user_id',
+        'notes',
+        'user_id'
     ];
 
     protected $casts = [
@@ -35,5 +36,20 @@ class Transaction extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Acessor para formatar o valor
+    public function getFormattedAmountAttribute()
+    {
+        return 'R$ ' . number_format($this->amount / 100, 2, ',', '.');
+    }
+
+    // Mutator para garantir que o valor seja armazenado corretamente
+    public function setAmountAttribute($value)
+    {
+        if (is_string($value)) {
+            $value = (float) str_replace(',', '.', str_replace('.', '', $value));
+        }
+        $this->attributes['amount'] = $value;
     }
 }

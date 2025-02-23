@@ -10,14 +10,14 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->string('description');
-            $table->decimal('amount', 10, 2);
+            $table->enum('type', ['income', 'expense']);
             $table->date('date');
-            $table->enum('type', ['expense', 'income']);
-            $table->text('note')->nullable();
-            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('description');
+            $table->bigInteger('amount'); // Armazena em centavos
+            $table->foreignId('category_id')->constrained();
+            $table->foreignId('account_id')->constrained();
+            $table->text('notes')->nullable();
+            $table->foreignId('user_id')->constrained();
             $table->timestamps();
         });
     }
@@ -26,4 +26,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('transactions');
     }
-}; 
+};

@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "onlitec/onlifin",
-    "version": "1.0.1",
+    "name": "onlifin/onlifin",
+    "version": "2.0.0",
     "type": "project",
-    "description": "Sistema de Gestão Financeira",
+    "description": "Sistema de Gestão Financeira Pessoal",
     "keywords": ["laravel", "framework", "financeiro", "gestao"],
     "license": "MIT",
     "require": {

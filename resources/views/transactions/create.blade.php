@@ -70,13 +70,17 @@
                             </label>
                             <div class="relative" x-data="moneyMask()">
                                 <input type="text" 
-                                    name="amount" 
+                                    name="amount_display" 
                                     id="amount" 
                                     x-ref="input"
                                     x-init="initMask()"
                                     class="form-input block w-full pl-3 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    value="{{ old('amount') }}" 
+                                    value="{{ old('amount') ? 'R$ ' . number_format(old('amount'), 2, ',', '.') : '' }}" 
                                     placeholder="R$ 0,00">
+                                <input type="hidden" 
+                                    name="amount" 
+                                    x-ref="hiddenInput"
+                                    value="{{ old('amount') }}">
                             </div>
                             @error('amount')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -156,38 +160,34 @@
 function moneyMask() {
     return {
         initMask() {
-            const mask = IMask(this.$refs.input, {
-                mask: 'R$ num',
-                blocks: {
-                    num: {
-                        // Máscara numérica
-                        mask: Number,
-                        // Configurações de formatação
-                        scale: 2, // Sempre mostra 2 casas decimais
-                        padFractional: true, // Completa com zeros
-                        radix: ',', // Separador decimal
-                        thousandsSeparator: '.', // Separador de milhar
-                        normalizeZeros: true,
-                        min: 0,
-                        max: 999999999999.99,
-                    }
-                },
-                lazy: false, // Importante: sempre mostra a máscara
-                overwrite: true // Permite sobrescrever
+            const input = this.$refs.input;
+            const hiddenInput = this.$refs.hiddenInput;
+            
+            const mask = IMask(input, {
+                mask: Number,
+                scale: 2,
+                thousandsSeparator: '.',
+                radix: ',',
+                normalizeZeros: true,
+                padFractional: true,
+                min: 0,
+                max: 999999999.99,
+                // Impede a multiplicação automática por 100
+                transform: (value) => {
+                    return value;
+                }
             });
 
-            // Garante valor inicial formatado
-            if (!this.$refs.input.value) {
-                mask.value = '0';
-            }
-
-            // Mantém sempre formatado
-            mask.on('complete', function() {
-                if (!mask.value) {
-                    mask.value = '0';
-                }
+            mask.on('accept', function() {
+                // Remove formatação e converte para formato do backend
+                let value = mask.value.replace(/\./g, '').replace(',', '.');
+                hiddenInput.value = value;
+                
+                // Log para debug
+                console.log('Valor digitado:', mask.value);
+                console.log('Valor enviado:', value);
             });
         }
     }
 }
-</script> 
+</script>

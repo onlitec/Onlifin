@@ -9,30 +9,47 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $currentMonth = Carbon::now()->startOfMonth();
-        
-        // Totais do mês atual
-        $totalIncome = Transaction::where('type', 'income')
-            ->whereMonth('date', $currentMonth)
-            ->sum('amount');
-            
-        $totalExpenses = Transaction::where('type', 'expense')
-            ->whereMonth('date', $currentMonth)
-            ->sum('amount');
-            
+        // Totais gerais
+        $totalIncome = Transaction::where('type', 'income')->sum('amount');
+        $totalExpenses = Transaction::where('type', 'expense')->sum('amount');
         $balance = $totalIncome - $totalExpenses;
-        
-        // Últimas transações
-        $recentTransactions = Transaction::with(['category'])
-            ->orderBy('date', 'desc')
-            ->limit(5)
+
+        // Transações de hoje
+        $today = now()->format('Y-m-d');
+        $todayIncomes = Transaction::with(['category', 'account'])
+            ->where('type', 'income')
+            ->whereDate('date', $today)
+            ->orderBy('date')
             ->get();
 
-        return view('dashboard', compact(
+        $todayExpenses = Transaction::with(['category', 'account'])
+            ->where('type', 'expense')
+            ->whereDate('date', $today)
+            ->orderBy('date')
+            ->get();
+
+        // Transações de amanhã
+        $tomorrow = now()->addDay()->format('Y-m-d');
+        $tomorrowIncomes = Transaction::with(['category', 'account'])
+            ->where('type', 'income')
+            ->whereDate('date', $tomorrow)
+            ->orderBy('date')
+            ->get();
+
+        $tomorrowExpenses = Transaction::with(['category', 'account'])
+            ->where('type', 'expense')
+            ->whereDate('date', $tomorrow)
+            ->orderBy('date')
+            ->get();
+
+        return view('dashboard.index', compact(
             'totalIncome',
             'totalExpenses',
             'balance',
-            'recentTransactions'
+            'todayIncomes',
+            'todayExpenses',
+            'tomorrowIncomes',
+            'tomorrowExpenses'
         ));
     }
 } 
