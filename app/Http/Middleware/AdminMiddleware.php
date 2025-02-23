@@ -13,10 +13,19 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->isAdmin()) {
-            return redirect()->route('dashboard');
+        \Log::info('AdminMiddleware: User', ['user' => auth()->user()]);
+        
+        if (!auth()->check()) {
+            \Log::info('AdminMiddleware: User not authenticated');
+            return redirect()->route('dashboard')->with('error', 'Acesso não autorizado.');
         }
 
+        if (!auth()->user()->is_admin) {
+            \Log::info('AdminMiddleware: User not admin');
+            return redirect()->route('dashboard')->with('error', 'Acesso não autorizado.');
+        }
+
+        \Log::info('AdminMiddleware: Access granted');
         return $next($request);
     }
 } 

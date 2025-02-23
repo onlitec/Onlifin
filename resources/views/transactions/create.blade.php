@@ -1,0 +1,193 @@
+<x-layouts.app>
+    <div class="container-app max-w-4xl mx-auto">
+        <!-- Cabeçalho -->
+        <div class="mb-6 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Nova Transação</h1>
+                <p class="mt-1 text-sm text-gray-600">Preencha os dados para registrar uma nova transação</p>
+            </div>
+            <a href="{{ route('transactions') }}" class="btn btn-secondary">
+                <i class="ri-arrow-left-line mr-2"></i>
+                Voltar
+            </a>
+        </div>
+
+        <!-- Card do Formulário -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+            <form action="{{ route('transactions.store') }}" method="POST">
+                @csrf
+                
+                <div class="p-6 space-y-6">
+                    <!-- Tipo e Data -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Tipo de Transação -->
+                        <div class="form-group">
+                            <label for="type" class="block text-sm font-medium text-gray-700 mb-1">
+                                Tipo de Transação
+                            </label>
+                            <select name="type" id="type" class="form-select block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="income" {{ old('type') == 'income' ? 'selected' : '' }}>Receita</option>
+                                <option value="expense" {{ old('type') == 'expense' ? 'selected' : '' }}>Despesa</option>
+                            </select>
+                            @error('type')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Data -->
+                        <div class="form-group">
+                            <label for="date" class="block text-sm font-medium text-gray-700 mb-1">
+                                Data
+                            </label>
+                            <input type="date" name="date" id="date" 
+                                class="form-input block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                value="{{ old('date', date('Y-m-d')) }}">
+                            @error('date')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- Descrição e Valor -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Descrição -->
+                        <div class="form-group">
+                            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+                                Descrição
+                            </label>
+                            <input type="text" name="description" id="description" 
+                                class="form-input block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                value="{{ old('description') }}" placeholder="Ex: Salário, Aluguel, etc">
+                            @error('description')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Valor -->
+                        <div class="form-group">
+                            <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">
+                                Valor
+                            </label>
+                            <div class="relative" x-data="moneyMask()">
+                                <input type="text" 
+                                    name="amount" 
+                                    id="amount" 
+                                    x-ref="input"
+                                    x-init="initMask()"
+                                    class="form-input block w-full pl-3 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    value="{{ old('amount') }}" 
+                                    placeholder="R$ 0,00">
+                            </div>
+                            @error('amount')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- Categoria e Conta -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Categoria -->
+                        <div class="form-group">
+                            <label for="category_id" class="block text-sm font-medium text-gray-700 mb-1">
+                                Categoria
+                            </label>
+                            <select name="category_id" id="category_id" class="form-select block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="">Selecione uma categoria</option>
+                                @foreach($categories ?? [] as $category)
+                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('category_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Conta -->
+                        <div class="form-group">
+                            <label for="account_id" class="block text-sm font-medium text-gray-700 mb-1">
+                                Conta
+                            </label>
+                            <select name="account_id" id="account_id" class="form-select block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="">Selecione uma conta</option>
+                                @foreach($accounts ?? [] as $account)
+                                    <option value="{{ $account->id }}" {{ old('account_id') == $account->id ? 'selected' : '' }}>
+                                        {{ $account->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('account_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- Observações -->
+                    <div class="form-group">
+                        <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
+                            Observações
+                        </label>
+                        <textarea name="notes" id="notes" rows="3" 
+                            class="form-textarea block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            placeholder="Observações adicionais (opcional)">{{ old('notes') }}</textarea>
+                        @error('notes')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3 rounded-b-xl">
+                    <a href="{{ route('transactions') }}" class="btn btn-secondary">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ri-save-line mr-2"></i>
+                        Salvar Transação
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</x-layouts.app>
+
+<script>
+function moneyMask() {
+    return {
+        initMask() {
+            const mask = IMask(this.$refs.input, {
+                mask: 'R$ num',
+                blocks: {
+                    num: {
+                        // Máscara numérica
+                        mask: Number,
+                        // Configurações de formatação
+                        scale: 2, // Sempre mostra 2 casas decimais
+                        padFractional: true, // Completa com zeros
+                        radix: ',', // Separador decimal
+                        thousandsSeparator: '.', // Separador de milhar
+                        normalizeZeros: true,
+                        min: 0,
+                        max: 999999999999.99,
+                    }
+                },
+                lazy: false, // Importante: sempre mostra a máscara
+                overwrite: true // Permite sobrescrever
+            });
+
+            // Garante valor inicial formatado
+            if (!this.$refs.input.value) {
+                mask.value = '0';
+            }
+
+            // Mantém sempre formatado
+            mask.on('complete', function() {
+                if (!mask.value) {
+                    mask.value = '0';
+                }
+            });
+        }
+    }
+}
+</script> 
