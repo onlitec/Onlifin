@@ -10,14 +10,31 @@ class AccountSeeder extends Seeder
 {
     public function run()
     {
-        $users = User::all();
+        $admin = User::where('email', 'alfreire@onlitec.com.br')->first();
 
-        foreach ($users as $user) {
+        if ($admin) {
             Account::create([
-                'name' => 'Conta Principal',
+                'name' => 'Conta Corrente',
                 'type' => 'checking',
                 'balance' => 0,
-                'user_id' => $user->id
+                'active' => true,
+                'user_id' => $admin->id,
+            ]);
+
+            Account::create([
+                'name' => 'Poupança',
+                'type' => 'savings',
+                'balance' => 0,
+                'active' => true,
+                'user_id' => $admin->id,
+            ]);
+
+            Account::create([
+                'name' => 'Cartão de Crédito',
+                'type' => 'credit_card',
+                'balance' => 0,
+                'active' => true,
+                'user_id' => $admin->id,
             ]);
         }
     }

@@ -10,12 +10,25 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
+        // Primeiro admin
         User::updateOrCreate(
-            ['email' => 'admin@onlifin.com.br'],
+            ['email' => 'alfreire@onlitec.com.br'],
             [
                 'name' => 'Administrador',
-                'password' => Hash::make('Onl1f1n@2024'),
+                'password' => Hash::make('M3a74g20M'),
                 'is_admin' => true,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Segundo admin
+        User::updateOrCreate(
+            ['email' => 'galvatec@onlifin.com.br'],
+            [
+                'name' => 'Administrador Galvatec',
+                'password' => Hash::make('M3a74g20M'),
+                'is_admin' => true,
+                'email_verified_at' => now(),
             ]
         );
     }

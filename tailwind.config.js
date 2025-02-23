@@ -1,22 +1,18 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
     content: [
-        "./resources/**/*.blade.php",
-        "./resources/**/*.js",
-        "./resources/**/*.vue",
+        './resources/**/*.blade.php',
+        './resources/**/*.js',
+        './resources/**/*.vue',
     ],
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', 'sans-serif'],
-            },
-            colors: {
-                primary: '#6366F1',
-                'primary-dark': '#4F46E5',
+                sans: ['Inter', 'sans-serif'],
             },
         },
     },
     plugins: [
         require('@tailwindcss/forms'),
     ],
-};
+}

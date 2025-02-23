@@ -1,0 +1,13 @@
+
+> build
+> vite build
+
+vite v5.4.14 building for production...
+transforming...
+✓ 55 modules transformed.
+rendering chunks...
+computing gzip size...
+public/build/.vite/manifest.json         0.28 kB │ gzip:  0.15 kB
+public/build/assets/style-Ec_RNnkU.css  27.04 kB │ gzip:  5.26 kB
+public/build/assets/app-CnQFB6pd.js     81.81 kB │ gzip: 30.59 kB
+✓ built in 1.48s

@@ -8,12 +8,9 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('accounts', function (Blueprint $table) {
+        Schema::create('role_user', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('type')->default('checking');
-            $table->decimal('balance', 10, 2)->default(0);
-            $table->boolean('active')->default(true);
+            $table->foreignId('role_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
@@ -21,6 +18,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('accounts');
+        Schema::dropIfExists('role_user');
     }
 }; 
