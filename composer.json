@@ -1,9 +1,10 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "onlitec/onlifin",
+    "version": "1.0.1",
     "type": "project",
-    "description": "Onlifin - Plataforma de Gestão Financeira",
-    "keywords": ["laravel", "framework", "financeiro"],
+    "description": "Sistema de Gestão Financeira",
+    "keywords": ["laravel", "framework", "financeiro", "gestao"],
     "license": "MIT",
     "require": {
         "php": "^8.2",

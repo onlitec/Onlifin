@@ -1,4 +1,4 @@
-# # Onlifin - Sistema de Gestão Financeira
+# Onlifin - Sistema de Gestão Financeira v1.0.1
 
 Sistema web desenvolvido com Laravel 11 e Livewire 3 para gestão financeira pessoal.
 
