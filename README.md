@@ -21,3 +21,15 @@ Sistema web desenvolvido com Laravel 11 e Livewire 3 para gestão financeira pes
 ## Instalação
 
 1. Clone o repositório
+
+### Backup e Restauração
+
+O sistema agora inclui um robusto sistema de backup que permite:
+- Criar backups completos do sistema
+- Fazer download dos backups
+- Restaurar o sistema a partir de um backup
+- Gerenciar backups antigos
+
+### Atualizações
+
+Para atualizar para a versão mais recente:
