@@ -6,9 +6,17 @@ use App\Models\Transaction;
 use App\Models\Category;
 use App\Models\Account;
 use Illuminate\Http\Request;
+use App\Services\NotificationService;
 
 class TransactionController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function index()
     {
         $transactions = Transaction::with(['category', 'account'])
@@ -92,9 +100,11 @@ class TransactionController extends Controller
         $validated['amount'] = $validated['amount'] * 100;
 
         $transaction->update($validated);
+        
+        // Notificar admins sobre a edição
+        $this->notificationService->notifyAdmins($transaction, 'editada');
 
-        return redirect()
-            ->route('dashboard')
+        return redirect()->route('transactions')
             ->with('success', 'Transação atualizada com sucesso!');
     }
 
@@ -105,6 +115,9 @@ class TransactionController extends Controller
             abort(403);
         }
 
+        // Notificar admins antes de excluir
+        $this->notificationService->notifyAdmins($transaction, 'excluída');
+        
         try {
             $transaction->delete();
             return redirect()
